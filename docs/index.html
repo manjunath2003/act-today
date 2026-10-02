@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Act Today — which companies deserve action</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF0EB; --panel:#F8FAF6; --ink:#16201C; --muted:#5A675F; --line:#CBD3CB;
+  --signal:#2540F0; --signal-soft:#DDE2FF; --ok:#1E7A4B; --ok-soft:#D8EEDF;
+  --warn:#A65A0A; --warn-soft:#F7E6CF; --bad:#9B2C2C; --bad-soft:#F4DADA; --hatch:#9AA8FF;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1411; --panel:#151D19; --ink:#E5ECE7; --muted:#93A099; --line:#28342E;
+    --signal:#8FA0FF; --signal-soft:#1D2350; --ok:#6FD39B; --ok-soft:#153224; --warn:#F0B26A; --warn-soft:#3A2810;
+    --bad:#F19A9A; --bad-soft:#3A1B1B; --hatch:#4A56B8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --panel:#151D19; --ink:#E5ECE7; --muted:#93A099; --line:#28342E;
+  --signal:#8FA0FF; --signal-soft:#1D2350; --ok:#6FD39B; --ok-soft:#153224; --warn:#F0B26A; --warn-soft:#3A2810;
+  --bad:#F19A9A; --bad-soft:#3A1B1B; --hatch:#4A56B8;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 20px 60px}
+header.top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,6vw,60px);line-height:.95;letter-spacing:-.03em;margin:0}
+.sub{color:var(--muted);margin:8px 0 0;max-width:60ch}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 16px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.ghost{border:2px solid var(--line);background:transparent;border-radius:999px;padding:7px 14px;font-weight:500}
+.ghost:hover{border-color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:13px;margin:14px 0 4px;align-items:center}
+.legend b{display:inline-block;width:34px;height:8px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.lg-solid{background:var(--signal)} .lg-hatch{background:repeating-linear-gradient(135deg,var(--hatch) 0 3px,transparent 3px 6px);border:1px solid var(--hatch)}
+details.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:14px 0}
+details.panel>summary{padding:12px 16px;cursor:pointer;font-weight:600}
+.panel-body{padding:4px 16px 16px;display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.panel-body p{margin:0 0 8px;color:var(--muted);font-size:14px}
+.sl{display:grid;grid-template-columns:120px 1fr 44px;gap:8px;align-items:center;margin:6px 0;font-size:14px}
+.sl input{width:100%;accent-color:var(--signal)}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px}
+main{display:grid;grid-template-columns:minmax(320px,430px) 1fr;gap:26px;margin-top:18px;align-items:start}
+@media (max-width:900px){main{grid-template-columns:1fr}}
+.list{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:28px 1fr 52px;gap:10px;text-align:left;width:100%;background:transparent;border:0;border-bottom:1px solid var(--line);padding:14px 8px 14px 4px}
+.row:hover{background:var(--panel)}
+.row[aria-current="true"]{background:var(--panel);box-shadow:inset 4px 0 0 var(--signal)}
+.rk{font-family:var(--display);font-weight:700;font-size:22px;color:var(--muted);line-height:1.1}
+.nm{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.01em;margin-right:8px}
+.rsub{color:var(--muted);font-size:13px;margin:2px 0 8px}
+.act-line{font-size:14px;margin:0 0 10px}
+.bar{height:10px;background:var(--line);border-radius:3px;display:flex;overflow:hidden}
+.bar i{display:block;height:100%}
+.bar .solid{background:var(--signal)}
+.bar .hatch{background:repeating-linear-gradient(135deg,var(--hatch) 0 3px,transparent 3px 6px)}
+.sc{font-family:var(--display);font-weight:700;font-size:24px;text-align:right}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;vertical-align:middle;white-space:nowrap}
+.c-act{background:var(--ok-soft);color:var(--ok)} .c-ver{background:var(--warn-soft);color:var(--warn)}
+.c-low{background:var(--bad-soft);color:var(--bad)} .c-wat{background:var(--signal-soft);color:var(--signal)} .c-skp{background:var(--line);color:var(--muted)}
+.c-sig{background:var(--ok-soft);color:var(--ok)} .c-noi{background:var(--line);color:var(--muted)}
+.mini{display:inline-flex;gap:8px;margin-top:-4px}
+.mini button{border:1px solid var(--line);background:transparent;border-radius:6px;padding:2px 10px;font-size:13px}
+.mini button:hover{border-color:var(--ink)}
+details.below{margin-top:16px}
+details.below summary{cursor:pointer;font-weight:600;padding:8px 0}
+.brow{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 4px;border-bottom:1px solid var(--line);width:100%;text-align:left;background:transparent;border-left:0;border-right:0;border-top:0}
+.brow:hover{background:var(--panel)}
+.brow small{grid-column:1/-1;color:var(--muted)}
+.detail{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px}
+.dh{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 20px;align-items:flex-start;margin-bottom:6px}
+.dh h2{font-family:var(--display);font-size:clamp(28px,4vw,42px);letter-spacing:-.02em;margin:0;line-height:1}
+.meta{color:var(--muted);font-size:14px;margin-top:6px}
+.big{font-family:var(--display);font-weight:700;font-size:54px;line-height:.9;text-align:right}
+.big small{display:block;font-family:var(--body);font-weight:400;font-size:12px;color:var(--muted);margin-top:4px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin:16px 0 18px}
+.tabs button{border:0;background:transparent;padding:9px 12px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--signal)}
+h3{font-family:var(--display);font-size:17px;margin:20px 0 8px;letter-spacing:-.005em}
+h3:first-child{margin-top:0}
+ul.t{margin:0;padding-left:18px} ul.t li{margin:5px 0;max-width:72ch}
+.tag{font-size:11.5px;font-weight:600;border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-left:6px;color:var(--muted);white-space:nowrap}
+.tag.inf{border-color:var(--warn);color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:13px}
+.tw{overflow-x:auto}
+.fac{display:grid;grid-template-columns:150px 42px 1fr;gap:4px 12px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line)}
+.fac .fv{font-family:var(--display);font-weight:700;font-size:20px}
+.fac p{margin:0;color:var(--muted);font-size:14px}
+@media (max-width:560px){.fac{grid-template-columns:1fr 42px}.fac p{grid-column:1/-1}}
+.who{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.pcard{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--bg)}
+.pcard.first{border:2px solid var(--signal)}
+.pcard b{font-family:var(--display);font-size:16px}
+.pcard p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+textarea{width:100%;min-height:260px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:14px;font:inherit;line-height:1.55;resize:vertical}
+input.subj{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:inherit;font-weight:600;margin-bottom:8px}
+.row-actions{display:flex;gap:10px;align-items:center;margin:8px 0 0;color:var(--muted);font-size:13px}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:8px 18px;font-weight:600}
+.meter{height:12px;background:var(--line);border-radius:3px;overflow:hidden;max-width:360px}
+.meter i{display:block;height:100%;background:var(--ok)}
+.note{background:var(--warn-soft);color:var(--ink);border-left:4px solid var(--warn);padding:10px 14px;border-radius:4px;font-size:14px;margin:12px 0}
+.verdictline{border-left:4px solid var(--signal);padding:6px 14px;margin:0 0 14px;background:var(--bg);font-size:15px}
+.how{margin-top:34px;border-top:2px solid var(--ink);padding-top:20px}
+.how ol{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;padding:0;margin:14px 0;list-style:none;counter-reset:s}
+.how li{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:12px;counter-increment:s;font-size:14px}
+.how li b{display:block;font-family:var(--display);font-size:16px;margin-bottom:4px}
+.how li b::before{content:counter(s) ". ";color:var(--signal)}
+footer{margin-top:26px;color:var(--muted);font-size:13px;max-width:80ch}
+a{color:var(--signal)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Act today</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="View">
+        <button id="m-today" aria-pressed="true">Today’s 5</button>
+        <button id="m-all" aria-pressed="false">All 12 ranked</button>
+      </div>
+      <button class="ghost" id="reset" title="Clear the companies you marked done">Reset done</button>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span><b class="lg-solid"></b>score now</span>
+    <span><b class="lg-hatch"></b>score held back until the data is verified</span>
+    <span>Data as of 29 Sep 2026 · every claim links to a source in the Evidence tab</span>
+  </div>
+
+  <details class="panel">
+    <summary>How the score works (and change the weights)</summary>
+    <div class="panel-body">
+      <div>
+        <p><b>Score = (w₁·Trigger + w₂·Fit + w₃·Budget + w₄·Reach) × (0.75 + 0.25·Confidence)</b></p>
+        <p>Trigger fades with age: <code>0.4 + 0.6 × 0.5^(days/14)</code>. A week-old event keeps ~82% of its force, a month-old one ~46%.</p>
+        <p>Confidence comes from the sources, not from a feeling: independent origins, whether one is a primary source, and unresolved conflicts. Ten outlets repeating one press release count once.</p>
+        <p>Action rule: strong trigger + confidence ≥ 0.6 + fit ≥ 45 → <b>Act today</b>. Strong trigger but thin data → <b>Verify first</b>. Strong trigger but fit &lt; 45 → <b>Low fit</b>.</p>
+      </div>
+      <div id="sliders"></div>
+    </div>
+  </details>
+
+  <main>
+    <section aria-label="Ranked companies">
+      <div class="list" id="list"></div>
+      <details class="below" id="below"><summary></summary><div id="belowlist"></div></details>
+    </section>
+    <section class="detail" id="detail" aria-live="polite"></section>
+  </main>
+
+  <section class="how">
+    <h3 style="font-size:24px;margin-top:0">How this stays fresh without me</h3>
+    <p style="max-width:75ch;color:var(--muted)">The data above was researched by hand and by AI on 29 Sep 2026. The companion repo turns the same steps into a pipeline that runs on a schedule and writes to a database, so the list rebuilds itself every morning.</p>
+    <ol>
+      <li><b>Input</b>Company URL or a funding-news feed item</li>
+      <li><b>Research</b>Site pages, news search, filings; each fact tagged with its source and tier</li>
+      <li><b>AI analysis</b>LLM returns strict JSON: signals, fit, personas, risks, conflicts</li>
+      <li><b>Structured output</b>Validated, scored with the formula above</li>
+      <li><b>Database</b>Snapshot per run; the diff between snapshots feeds “What changed”</li>
+      <li><b>Digest</b>Top 5 pushed to email or Slack with one action each</li>
+    </ol>
+  </section>
+  <footer>Scores are analyst judgements made explicit, not measurements. The “inferred” tags mark anything that is my reasoning rather than a sourced fact. Contact details for named people were deliberately not collected.</footer>
+</div>
+
+<script>
+/* ===================== DATA ===================== */
+const TODAY = new Date("2026-09-29T00:00:00");
+const WEEKLY = ["Entrackr weekly funding report (21–26 Sep 2026)","https://entrackr.com/report/weekly-funding-report-weekly-funding-report/funding-and-acquisitions-in-indian-startups-this-week-sep-21-sep-26-12577542"];
+const RULES = {
+  funding_round:      {v:"signal", s:3, why:"New capital usually opens new tooling budgets within a quarter."},
+  leadership_c_suite: {v:"signal", s:3, why:"New executives review tools and processes early in their tenure (heuristic, not sourced)."},
+  expansion_plan:     {v:"signal", s:2, why:"Scaling operations outgrow manual workflows."},
+  launch:             {v:"signal", s:2, why:"A launch creates integration and support load."},
+  use_of_funds_tech:  {v:"signal", s:2, why:"Stated spend on tech or AI is direct buying intent."},
+  valuation_up:       {v:"watch",  s:1, why:"Supports budget confidence; not a trigger on its own."},
+  ipo_filing:         {v:"watch",  s:1, why:"IPO prep is a long horizon with quiet-period limits."},
+  leadership_board:   {v:"watch",  s:1, why:"Board appointments rarely change tooling budgets."},
+  metric_claim:       {v:"watch",  s:1, why:"Self-reported metric; context only."},
+  rebrand:            {v:"noise",  s:0, why:"Cosmetic unless paired with a product pivot."},
+  secondary_sale:     {v:"noise",  s:0, why:"Investor liquidity: no new money enters the company."}
+};
+const C = [
+{ id:"olyv", name:"Olyv", sector:"Digital lending", hq:"Bengaluru",
+  event:{date:"2026-09-22", label:"New CFO announced"},
+  f:{trigger:85, fit:88, budget:65, reach:78},
+  fw:{trigger:"Leadership change inside the last 10 days. New CFOs tend to review finance tooling early (heuristic, not sourced).",
+      fit:"Lending runs on repeatable back-office flows: partner reporting, reconciliation, collections, KYC. Inferred from the business model.",
+      budget:"No funding round found in this research; the release cites “strong momentum” in lending and wellness (company claim). Scored mid until verified.",
+      reach:"CEO/founder and the new CFO are both named in the release. Bengaluru-based."},
+  action:{t:"Pitch", text:"Email new CFO Ravi Sharma today. Offer a two-week pilot on one finance workflow."},
+  brief:{
+    what:"Digital lending platform for personal loans, founded 2016 and based in Bengaluru (CB Insights). Founder-CEO is Rohit Garg. Runs lending and financial-wellness businesses.",
+    now:["Ravi Sharma named CFO on 22–23 Sep. 17+ years in financial services; previously CFO at Finova Capital, where he closed five equity rounds and onboarded 50+ lending partners.","Company describes “strong momentum” across lending and financial wellness (company claim, unverified)."],
+    opps:["Lender and partner reporting and reconciliation. His Finova background suggests many partners to report to.","Month-end close and management MIS packs.","Collections and KYC operations workflows."],
+    risks:["No funding round found, so budget is unverified.","Regulated sector: expect security and vendor reviews before any pilot.","Press release only. No independent reporting on the CFO hire beyond one weekly roundup."],
+    ask:["Which finance workflow is the most manual today?","How many lending partners need monthly reporting?","What is on your 90-day plan?"]},
+  who:{ reasoning:"For a finance-automation pitch the CFO is the economic buyer, and this one is new in the seat and publicly named. The CEO is the sponsor who can say yes fast. The person who lives with the pain (collections or credit-ops lead) is the champion, but their name was not in the sources.",
+    people:[
+      {r:"Primary", n:"Ravi Sharma, Chief Financial Officer", w:"New in seat, owns financial strategy and capital planning per the release, and has scaled partner onboarding before. Most likely to be reviewing how finance work gets done."},
+      {r:"Second, if no reply in 4 business days", n:"Rohit Garg, CEO and Founder", w:"Executive sponsor. One short note that references the CFO note, not a duplicate pitch."},
+      {r:"Champion, name to find", n:"Head of collections or credit operations", w:"Feels the manual work daily. Find via LinkedIn; do not guess a name."}],
+    avoid:"Generic info@ inboxes, and starting with the security or IT head, which opens a vendor-review track before anyone owns the problem."},
+  outreach:{subject:"Ravi, your first 90 days at Olyv",
+    body:"Hi Ravi,\n\nCongratulations on joining Olyv as CFO. At Finova you closed five funding rounds and onboarded 50+ lending partners. In my experience that is the point where reporting and reconciliation start growing faster than the finance team.\n\nWe build AI-driven automation for exactly that kind of work: partner MIS, reconciliations, month-end packs. If it helps, pick one workflow you would like off your team’s plate and I will show a working version in two weeks. No commitment.\n\nWould a 20-minute call next week be useful?\n\n[Your name]\n[Company] · [phone]",
+    facts:[["Joined as CFO, 22–23 Sep","Olyv press release"],["Closed five equity rounds, onboarded 50+ lending partners at Finova","Same release"],["The “growing faster than the team” line is an opinion, not a sourced fact","Inferred"]]},
+  changes:[{f:"CFO",b:"No announcement found",a:"Ravi Sharma (ex-CFO, Finova Capital)",k:"leadership_c_suite"}],
+  sources:[
+   {o:"Olyv press release (syndicated by 5+ outlets = 1 origin)",tier:"T1",u:[["MediaBrief","https://mediabrief.com/ravi-sharma-olyv-cfo/"],["MediaNews4U","https://www.medianews4u.com/olyv-names-ravi-sharma-as-chief-financial-officer/"],["Adgully","https://www.adgully.com/post/21012/olyv-appoints-ravi-sharma-as-chief-financial-officer-to-drive-growth"],["PNI","https://www.pninews.com/olyv-appoints-former-finova-capital-cfo-ravi-sharma-as-its-chief-financial-officer/"]]},
+   {o:"Entrackr weekly report",tier:"T2",u:[WEEKLY]},
+   {o:"CB Insights company profile",tier:"T3",u:[["CB Insights","https://www.cbinsights.com/company/smartcoin"]]}],
+  conflicts:[
+   {f:"Headquarters",claims:[["Bengaluru","CB Insights"],["New Delhi","Press-release dateline"]],pick:"Bengaluru",why:"A dateline shows where the PR agency filed the release, not where the company sits. A company database beats it.",sev:"minor"},
+   {f:"Announcement date",claims:[["22 Sep","Adgully (dated 22 Sep)"],["23 Sep","Business News This Week"]],pick:"22 Sep",why:"Earliest dated publication wins; syndicated copies lag.",sev:"minor"}]},
+
+{ id:"disha", name:"Disha (Curelink)", sector:"AI health coaching", hq:"Bengaluru",
+  event:{date:"2026-09-19", label:"Series A disclosed"},
+  f:{trigger:80, fit:85, budget:70, reach:80},
+  fw:{trigger:"Series A reported 19 Sep, ten days old. Funds explicitly go to AI model development and tech.",
+      fit:"24×7 coaching in three languages at 1.4 crore messages is an operations-heavy product: quality checks, routing to humans, lifecycle messaging. Inferred.",
+      budget:"Rs 43.88 Cr raised, but FY25 revenue was only Rs 4.91 Cr, so spend will be disciplined.",
+      reach:"Both co-founders are named. Roles are not stated in sources."},
+  action:{t:"Pitch", text:"Message co-founder Aman Singla. Lead with 1.4 crore messages and the ops layer around the AI."},
+  brief:{
+    what:"AI health-coaching platform built by Curelink (founded 2021 by Aman Singla and Divyansh Jain). Personalised diet, fitness and chronic-care support across 15 conditions in Hindi, English and Hinglish. Bengaluru-based per one source.",
+    now:["Rs 43.88 Cr Series A led by General Catalyst, with Elevation Capital. Post-money about Rs 288 Cr (Entrackr estimate), up from about Rs 190 Cr.","Funds are earmarked for working capital, AI model development, technology and expansion.","Claims 70 lakh sign-ups, 3 lakh active users and 1.4 crore messages. FY25 revenue Rs 4.91 Cr (doubled), loss Rs 4.45 Cr."],
+    opps:["Conversation QA and escalation routing between AI and human coaches.","Lifecycle and CRM automation: 70 lakh sign-ups vs 3 lakh active is a conversion gap.","Monitoring for clinical-safety guardrails on AI answers."],
+    risks:["Health data: consent and privacy scrutiny will slow procurement.","May prefer an in-house AI team given the stated AI-model spend.","Use the name “Disha”; Curelink is the parent brand."],
+    ask:["How do you catch a bad AI answer today, before a user does?","What share of chats get handed to a human coach?"]},
+  who:{ reasoning:"Two founders hold 31.10% each, so either can decide. Sources give equity, not titles, so I will not guess who is CEO or CTO. Product-ops questions go to whoever owns coaching quality; that person’s name is not in the sources.",
+    people:[
+      {r:"Primary", n:"Aman Singla, co-founder", w:"Largest shareholder alongside his co-founder; public face of the Series A. Role not stated in sources, so check LinkedIn before writing."},
+      {r:"Second", n:"Divyansh Jain, co-founder", w:"Same equity. If Aman’s profile shows a business role, Divyansh is more likely the technical owner. Verify."},
+      {r:"Champion, name to find", n:"Head of coaching operations or quality", w:"Owns the workflow the automation would change."}],
+    avoid:"The investors (General Catalyst, Elevation). They are not buyers and it reads as name-dropping."},
+  outreach:{subject:"1.4 crore messages, and the ops layer around them",
+    body:"Hi Aman,\n\nCongratulations on the Series A. What stood out was the volume: a claimed 1.4 crore messages across 3 lakh active users, in Hindi, English and Hinglish. At that scale, quality control and routing to human coaches usually become the bottleneck before model quality does.\n\nWe build the automation around AI products: conversation QA sampling, escalation routing, and lifecycle messaging tied to your CRM. If the new capital goes to model work first, I would like to show you how we would instrument the ops side in a small pilot.\n\nOpen to 20 minutes next week?\n\n[Your name]\n[Company] · [phone]",
+    facts:[["Series A led by General Catalyst","Entrackr filings review"],["1.4 crore messages, 3 lakh active users (company claims)","Entrackr; secondary outlets"],["Hindi, English, Hinglish; 15 conditions","Multiple outlets"],["“Usually become the bottleneck” is opinion","Inferred"]]},
+  changes:[
+   {f:"Series A",b:"Previous round (about Rs 190 Cr post-money, est.)",a:"Rs 43.88 Cr at about Rs 288 Cr post-money",k:"funding_round"},
+   {f:"Valuation",b:"About Rs 190 Cr",a:"About Rs 288 Cr (+52%)",k:"valuation_up"},
+   {f:"Use of funds",b:"Not stated",a:"AI model development and tech improvement",k:"use_of_funds_tech"},
+   {f:"Brand",b:"Curelink",a:"Disha (consumer product)",k:"rebrand"}],
+  sources:[
+   {o:"Regulatory filings, reviewed by Entrackr",tier:"T1",u:[["Entrackr exclusive","https://entrackr.com/exclusive/exclusive-disha-formerly-curelink-raises-series-a-led-by-general-catalyst-12551971"]]},
+   {o:"BW Disrupt (own report)",tier:"T2",u:[["BW Disrupt via AlphaMaven","https://alpha-maven.com/story/venture-capital/disha-formerly-known-as-curelink-raises-rs-4388-cr-from-general-catalyst-amp-existing-investors-bw-disrupt"]]},
+   {o:"Aggregators and rewrites (derive from the above)",tier:"T3",u:[["TheSaaSNews","https://www.thesaasnews.com/news/disha-raises-4-6m-series-a/"],["Lucidity","https://lucidityinsights.com/news/disha-raises-52m-series-a"],["Newskart","https://www.newskart.com/disha-raises-5-3m-series-a-to-build-ai-health-coaching-for-india/"]]}],
+  conflicts:[
+   {f:"Round size in USD",claims:[["$4.6M","TheSaaSNews / Dealroom"],["$5.2M","Lucidity headline"],["$5.3M","Newskart"],["about $6M","Lucidity body"]],pick:"Rs 43.88 Cr (about $4.6M)",why:"Every outlet shares one INR figure taken from filings; the USD numbers differ only by the exchange rate used. $4.6M matches the rate Entrackr uses for the Rio Health round (about Rs 95–96 per dollar). Lead with INR, show USD as approximate.",sev:"minor"},
+   {f:"Date of news",claims:[["19 Sep","Entrackr, Dealroom"],["22 Sep","Newskart"],["26 Sep","Weekly roundup"]],pick:"19 Sep",why:"Roundups and rewrites lag the first report.",sev:"minor"},
+   {f:"Founder titles",claims:[["Not stated","All sources"]],pick:"Unknown",why:"Sources give equity split, not titles. Do not guess; check LinkedIn.",sev:"open"}]},
+
+{ id:"rio", name:"Rio Health", sector:"Medicine quick commerce", hq:"Gurugram (serves Delhi NCR)",
+  event:{date:"2026-09-24", label:"Pre-Series A announced"},
+  f:{trigger:82, fit:90, budget:60, reach:72},
+  fw:{trigger:"Rs 43.08 Cr round plus a public plan to go from three to 15+ dark stores. Both are expansion triggers.",
+      fit:"Company says the money goes to ordering, inventory and delivery technology, and to predicting neighbourhood-level demand. That is stated intent.",
+      budget:"Most of the raise will go to dark stores and working capital, so the tech budget is real but modest.",
+      reach:"Founders are named and the company is small. Based in NCR, so a remote-first pitch."},
+  action:{t:"Pitch", text:"Message founder Ankur Agrawal. Three stores to 15+ is an ordering and inventory problem."},
+  brief:{
+    what:"Quick-commerce pharmacy delivering medicines and health essentials in 20–30 minutes across Delhi NCR. Founded by Ankur Agrawal and Amit Ahuja. 20,000+ SKUs, 30,000+ orders a month, average order Rs 600–700 (company figures).",
+    now:["Rs 43.08 Cr ($4.5M) pre-Series A led by Version One Ventures. Total raised Rs 62.24 Cr.","Plan: grow from three dark stores to 15+; strengthen ordering, inventory and delivery technology.","Targets an annual run rate above Rs 150 Cr within 9–12 months (company target)."],
+    opps:["Order intake and checks: turning chat or app orders into validated orders.","Neighbourhood-level demand prediction feeding replenishment. Founder says this is a focus.","A repeatable playbook for opening store #4 to #15: stock setup, checklists, onboarding."],
+    risks:["Delhi NCR only: remote sales or travel.","Medicine delivery carries licensing and traceability duties. Expect compliance questions.","One source says orders come via WhatsApp; verify on their site before using it."],
+    ask:["Where do orders get stuck today: intake, stock, or dispatch?","What breaks first when store #4 opens?"]},
+  who:{ reasoning:"A 30,000-orders-a-month company with two founders decides fast, and the funding story is founder-led. The founder who talked about technology and demand prediction is the natural first message.",
+    people:[
+      {r:"Primary", n:"Ankur Agrawal, founder", w:"Quoted on technology and demand prediction; owns the plan to scale from three stores."},
+      {r:"Second", n:"Amit Ahuja, co-founder", w:"Equal 17.5% stake. Approach if Ankur does not reply, mentioning the first note."},
+      {r:"Champion, name to find", n:"Head of operations or supply", w:"Runs dark-store launches. Find via LinkedIn."}],
+    avoid:"Investors (Version One, Xeed, Good Capital)."},
+  outreach:{subject:"Three dark stores to 15+",
+    body:"Hi Ankur,\n\nCongratulations on the pre-Series A. Going from three dark stores to 15+, at 30,000+ orders a month, is a big operational jump, and with medicines a wrong pick or substitution costs more than a bad review.\n\nWe build AI workflows that clean up the order flow (intake, stock check, substitutions) and feed demand signals back to replenishment. A concrete first step: automate one part of intake-to-dispatch at your busiest store for two weeks and measure error rate and handling time.\n\nWorth a short call?\n\n[Your name]\n[Company] · [phone]",
+    facts:[["Three dark stores, target 15+","Entrackr filings review; company statement"],["30,000+ orders a month","Company figure via Business Standard"],["Demand prediction and inventory tech as funding use","Founder quote, Business Standard"],["“Costs more than a bad review” is opinion","Inferred"]]},
+  changes:[
+   {f:"Total funding",b:"Rs 19.16 Cr",a:"Rs 62.24 Cr",k:"funding_round"},
+   {f:"Dark stores",b:"3 operating",a:"15+ planned",k:"expansion_plan"},
+   {f:"Run-rate target",b:"Not stated",a:"Rs 150 Cr+ in 9–12 months",k:"metric_claim"}],
+  sources:[
+   {o:"Regulatory filings, reviewed by Entrackr",tier:"T1",u:[["Entrackr exclusive","https://entrackr.com/exclusive/exclusive-rioai-raises-rs-43-cr-in-pre-series-a-led-by-version-one-ventures-12566460"]]},
+   {o:"Company statement (Business Standard, IndianStartupNews, BW Disrupt)",tier:"T1",u:[["Business Standard","https://www.business-standard.com/amp/markets/news/rio-health-raises-4-5-mn-in-pre-series-a-led-by-version-one-ventures-126092400853_1.html"],["IndianStartupNews","https://indianstartupnews.com/funding/rio-health-raises-45-million-to-expand-20-30-minute-medicine-delivery-across-delhi-ncr-12574219"],["BW Disrupt","https://www.bwdisrupt.com/article/rio-health-raises-4-5-mn-in-pre-series-a-round-led-by-version-one-ventures-625529"]]}],
+  conflicts:[
+   {f:"Round size",claims:[["Rs 43 Cr","Company announcement (rounded)"],["Rs 43.08 Cr","Filings via Entrackr"]],pick:"Rs 43.08 Cr",why:"The filing figure is exact; the company rounded.",sev:"minor"},
+   {f:"Headquarters",claims:[["Gurugram","BSA funding alert"],["Delhi NCR","Entrackr, Business Standard"]],pick:"Gurugram, serving Delhi NCR",why:"Gurugram is in NCR, so the sources do not truly disagree. Operating area is not the same as registered office.",sev:"minor"},
+   {f:"Entity name",claims:[["Rio Health","Brand"],["Rio.ai","Filing entity"]],pick:"Same company",why:"Consumer brand vs legal entity.",sev:"minor"}]},
+
+{ id:"uv", name:"Ultraviolette", sector:"Electric mobility", hq:"Not stated in sources",
+  event:{date:"2026-09-24", label:"$85M round (date approximated to the report week)"},
+  f:{trigger:75, fit:62, budget:92, reach:50},
+  fw:{trigger:"$85M round reported this week. Exact date not given; I used the middle of the 21–26 Sep report week.",
+      fit:"Hardware maker with dealer, service, warranty and supplier flows. Inferred, and less obviously an AI-automation buyer.",
+      budget:"Large round: budget exists.",
+      reach:"Larger organisation; no contact information in the sources."},
+  action:{t:"Verify", text:"Confirm the $85M round and HQ from a second source (10 min), then find the service or ops lead."},
+  brief:{
+    what:"Electric mobility startup. HQ and product details were not in the sources I gathered.",
+    now:["$85M round led by Yali Capital and TDK Ventures; Walden International chairman Lip-Bu Tan and existing investors joined (Entrackr, week of 21–26 Sep)."],
+    opps:["Service, warranty and dealer-network workflows.","Supplier and parts coordination."],
+    risks:["Single source: verify the round and HQ.","Bigger ops organisation means a longer sales cycle."],
+    ask:["Confirm round details from the company site or a second outlet."]},
+  who:{ reasoning:"Not enough verified detail to name a person. Verify first, then look for the head of service or operations.", people:[{r:"After verification", n:"Head of service or operations", w:"Owns dealer and service workflows. Name not in sources."}], avoid:"Do not pitch investors."},
+  outreach:null,
+  changes:[{f:"Funding",b:"Not researched",a:"$85M (Yali Capital, TDK Ventures)",k:"funding_round"}],
+  sources:[{o:"Entrackr weekly report",tier:"T2",u:[WEEKLY]}],
+  conflicts:[{f:"Headquarters",claims:[["Not stated","Entrackr"]],pick:"Unknown",why:"Not in the sources gathered; must be verified.",sev:"open"}]},
+
+{ id:"drivn", name:"Drivn", sector:"Electric commercial mobility", hq:"Not stated in sources",
+  event:{date:"2026-09-24", label:"Seed round (date approximated to the report week)"},
+  f:{trigger:70, fit:65, budget:50, reach:55},
+  fw:{trigger:"Rs 45 Cr seed reported in the 21–26 Sep week.",fit:"Fleet operations, dispatch and telemetry integrations are plausible, but I know little about the product.",budget:"Seed-stage cash: modest.",reach:"Small team, likely founder-led. No names in the sources."},
+  action:{t:"Verify", text:"Confirm what Drivn’s Indian entity does and who runs it, then approach the founder."},
+  brief:{what:"Electric commercial mobility startup; its Indian entity raised the round.",now:["Rs 45 Cr ($4.7M) seed led by Avaana Capital (Entrackr)."],opps:["Fleet ops and dispatch workflows (inferred)."],risks:["Single source, thin detail.","Unclear whether the Indian entity is the operating business."],ask:["Verify company website, team and product."]},
+  who:{reasoning:"Founder-led at seed stage, but no names are in the sources.",people:[{r:"After verification",n:"Founder or co-founder",w:"Seed-stage decisions sit with founders."}],avoid:"Investors."},
+  outreach:null,
+  changes:[{f:"Seed round",b:"Not researched",a:"Rs 45 Cr ($4.7M), led by Avaana Capital",k:"funding_round"}],
+  sources:[{o:"Entrackr weekly report",tier:"T2",u:[WEEKLY]}],
+  conflicts:[{f:"What the “Indian entity” is",claims:[["Not explained","Entrackr"]],pick:"Unknown",why:"Needs a second source.",sev:"open"}]},
+
+{ id:"aqua", name:"Aquapulse", sector:"Aquaculture supply chain", hq:"Odisha / West Bengal operations",
+  event:{date:"2026-09-24", label:"Expansion plan (date approximated)"},
+  f:{trigger:60, fit:65, budget:40, reach:50},
+  fw:{trigger:"An expansion plan, not a funding event; date approximated to the report week.",fit:"7,000+ farmers and procurement logistics: onboarding and coordination automation is plausible (inferred).",budget:"No funding information found.",reach:"No names in the sources."},
+  action:{t:"Verify", text:"Check funding status and founders, then pitch farmer-onboarding and procurement automation."},
+  brief:{what:"Works with 7,000+ shrimp farmers across 20,000 hectares in Odisha and West Bengal.",now:["Targets 5,000 MT procurement (about 2,000 MT last year) and 10,000 farmers, entering Andhra Pradesh."],opps:["Farmer onboarding and procurement scheduling (inferred)."],risks:["No funding found; budget unknown."],ask:["Verify funding, team and HQ."]},
+  who:{reasoning:"No names in sources.",people:[{r:"After verification",n:"Founder or head of procurement",w:"Owns procurement growth."}],avoid:"—"},
+  outreach:null,
+  changes:[{f:"Procurement",b:"About 2,000 MT last year",a:"5,000 MT target",k:"expansion_plan"},{f:"Farmer network",b:"7,000+ farmers",a:"10,000 target; entering Andhra Pradesh",k:"expansion_plan"}],
+  sources:[{o:"Entrackr weekly report (news flash)",tier:"T2",u:[WEEKLY]}],conflicts:[]},
+
+{ id:"defined", name:"Definedge", sector:"Fintech / brokerage", hq:"Not stated in sources",
+  event:{date:"2026-09-24", label:"Funding round (amount not found)"},
+  f:{trigger:55, fit:55, budget:35, reach:50},
+  fw:{trigger:"Listed as funded this week, but I found no amount.",fit:"Broker back-office and client-support workflows are plausible (inferred).",budget:"Unknown.",reach:"Unknown."},
+  action:{t:"Verify", text:"Find the round size and team before deciding."},
+  brief:{what:"Fintech and brokerage startup named among the week’s funded companies.",now:["Funding reported; amount not found in the sources I gathered."],opps:["Back-office and client-support automation (inferred)."],risks:["Almost no verified detail."],ask:["Verify everything."]},
+  who:{reasoning:"No verified details.",people:[{r:"After verification",n:"Founder",w:"Unknown."}],avoid:"—"},outreach:null,
+  changes:[{f:"Funding",b:"Not researched",a:"Round reported; amount not found",k:"funding_round"}],
+  sources:[{o:"Entrackr weekly report",tier:"T2",u:[WEEKLY]}],
+  conflicts:[{f:"Round amount",claims:[["Not stated","Entrackr"]],pick:"Unknown",why:"Do not quote a figure.",sev:"open"}]},
+
+{ id:"ema", name:"Ema", sector:"Enterprise AI agents", hq:"Mountain View; offices in Bengaluru, London, Vancouver",
+  event:{date:"2026-09-23", label:"$77M Series B"},
+  f:{trigger:75, fit:40, budget:95, reach:45},
+  fw:{trigger:"$77M Series B on 23 Sep; senior GTM leaders already hired.",fit:"They sell AI agents for HR, IT and finance. They are far more likely a peer or partner than a buyer.",budget:"$140M raised in total.",reach:"About 200 staff, senior inboxes are crowded."},
+  action:{t:"Partner", text:"Not a buyer. Track for an implementation-partner angle as their GTM scales."},
+  brief:{what:"Enterprise platform for agentic “AI Employees” across HR, IT and finance. Founded 2023 by Surojit Chatterjee (CEO) and Souvik Sen. About 200 people.",
+    now:["$77M Series B led by Creaegis; total funding $140M; valuation more than quadrupled since the 2024 round.","Money goes to go-to-market, with several senior leaders already hired.","Product-led model: says it deploys without services-heavy implementations."],
+    opps:["Integration or implementation partner as deployments multiply (inferred)."],
+    risks:["Sells what you sell. Pitching them as a customer will fall flat.","“$150M bookings” includes multi-year contract value and is not ARR (single secondary source)."],
+    ask:["Is there a partner or ecosystem programme?"]},
+  who:{reasoning:"As a partnership, the target is whoever runs partnerships or GTM. Names of the new senior hires are not in my sources.",people:[{r:"If pursued", n:"Head of partnerships or GTM", w:"Owns implementation-partner decisions."}],avoid:"Founder cold email as a customer pitch."},
+  outreach:null,
+  changes:[{f:"Total funding",b:"About $63M (derived: $140M − $77M)",a:"$140M",k:"funding_round"},{f:"Valuation",b:"2024 round",a:"More than 4× (company)",k:"valuation_up"},{f:"GTM team",b:"Not stated",a:"Several senior leaders hired",k:"expansion_plan"}],
+  sources:[
+   {o:"Company release (GlobeNewswire)",tier:"T1",u:[["GlobeNewswire","https://www.globenewswire.com/news-release/2026/09/23/3367506/0/en/ema-raises-77m-series-b-to-put-ai-employees-to-work-across-the-enterprise.html"]]},
+   {o:"DealStreetAsia",tier:"T2",u:[["DealStreetAsia","https://www.dealstreetasia.com/stories/ai-ema-creaegis-496087"]]},
+   {o:"The AI Insider",tier:"T2",u:[["The AI Insider","https://theaiinsider.tech/2026/09/24/ema-raises-77m-series-b-to-scale-ai-agents-across-enterprise-hr-it-and-finance/"]]},
+   {o:"Entrackr weekly report",tier:"T2",u:[WEEKLY]}],
+  conflicts:[
+   {f:"Headquarters",claims:[["Mountain View / California","Company-linked and most outlets"],["Bengaluru-based","DealStreetAsia"],["Indian startup","Entrackr"]],pick:"Mountain View HQ; offices in Bengaluru, London, Vancouver",why:"Most sources agree. A likely cause of the mislabel: the lead investor, Creaegis, is Bengaluru-based (my hypothesis).",sev:"minor"},
+   {f:"The “$150M” figure",claims:[["Bookings incl. multi-year contracts","CEO clarification, one secondary source"]],pick:"Call it bookings, never ARR",why:"Quoting it as revenue would overstate. Verify before using at all.",sev:"minor"}]},
+
+{ id:"sol", name:"Sol", sector:"Proactive AI assistant", hq:"San Francisco entity; India-linked founders",
+  event:{date:"2026-09-23", label:"Out of stealth, $4M"},
+  f:{trigger:70, fit:30, budget:55, reach:65},
+  fw:{trigger:"Emerged from stealth with $4M on 23 Sep.",fit:"Builds the same class of product. Not a natural customer.",budget:"$4M seed, spent on research, compute and hiring.",reach:"Three named founders, small team."},
+  action:{t:"Watch", text:"Peer, not prospect. Good benchmark; possible network contact."},
+  brief:{what:"Proactive AI that scans Gmail for commitments, then drafts the work for approval. Founded 2025 by ex-Cred executives Anish Karan (CEO), Prateek Srivastava and Ranjith Nair. More than 100 pre-launch users; US-first.",
+    now:["$4M from General Catalyst, Nexus Venture Partners, DeVC, Peercheque and Kunal Shah.","Funds go to research, compute, hiring and global expansion."],
+    opps:["None as a customer. Useful as a market benchmark."],risks:["Competes in your category."],ask:["—"]},
+  who:{reasoning:"Not pursued as a buyer.",people:[{r:"If pursued", n:"Anish Karan, CEO",w:"Named CEO in the release."}],avoid:"—"},outreach:null,
+  changes:[{f:"Status",b:"Stealth",a:"Out of stealth; 100+ pre-launch users; waitlist",k:"launch"},{f:"Funding",b:"None found",a:"$4M",k:"funding_round"}],
+  sources:[
+   {o:"Company release (Business Wire)",tier:"T1",u:[["Business Wire","https://www.businesswire.com/news/home/20260923586872/en/Sol-From-Sol-Foundry-Inc.-Emerges-From-Stealth-With-$4M-for-AI-That-Finds-and-Does-the-Work-You-Promised-in-Email"]]},
+   {o:"YourStory",tier:"T2",u:[["YourStory","https://yourstory.com/2026/09/ai-startup-sol-raises-4-million-from-general-catalyst-kunal-shah-and-others"]]},
+   {o:"Economic Times (via inkl)",tier:"T2",u:[["inkl / ET","https://www.inkl.com/news/cred-alumnis-sol-raises-4-million-from-gc-nexus-venture-partners-kunal-shah"]]},
+   {o:"The Head and Tale",tier:"T3",u:[["The Head and Tale","https://theheadandtale.com/ai-emerging-tech/sol-raises--4-million-funding-led-by-general-catalyst-nexus/"]]}],
+  conflicts:[{f:"Headquarters",claims:[["San Francisco","Business Wire dateline; entity Sol Foundry Inc."],["Bengaluru-based","The Head and Tale"]],pick:"US entity; team location unconfirmed",why:"Both can be true: a US company with an India team. Left open until confirmed.",sev:"open"}]},
+
+{ id:"spinny", name:"Spinny", sector:"Used-car retail", hq:"Not stated in sources",
+  event:{date:"2026-09-24", label:"Confidential IPO pre-filing (per sources)"},
+  f:{trigger:45, fit:55, budget:90, reach:30},
+  fw:{trigger:"IPO pre-filing is reported “according to sources” and is not public.",fit:"Large ops, plausible fit, but IPO-readiness work is usually done by big firms.",budget:"Large.",reach:"Large company; no direct path."},
+  action:{t:"Watch", text:"IPO prep is a 2027 story. Revisit if a finance-transformation hire shows up."},
+  brief:{what:"Used-car retailing platform.",now:["Confidentially pre-filed draft IPO papers with SEBI to raise Rs 2,500–3,000 Cr; 2027 listing targeted (per sources).","Akhil Gupta (ex-Bharti) named board chairman."],opps:["Reporting and compliance workflows during IPO prep (inferred)."],risks:["Unconfirmed report; long horizon."],ask:["—"]},
+  who:{reasoning:"Not worth a named target today.",people:[{r:"Later", n:"CFO or head of finance ops", w:"Owns IPO-readiness reporting."}],avoid:"—"},outreach:null,
+  changes:[{f:"IPO",b:"No public filing",a:"Confidential pre-filing (per sources)",k:"ipo_filing"},{f:"Board chair",b:"Not stated",a:"Akhil Gupta appointed",k:"leadership_board"}],
+  sources:[{o:"Entrackr (citing sources)",tier:"T2",u:[WEEKLY]}],
+  conflicts:[{f:"IPO filing status",claims:[["Confidentially pre-filed","“According to sources”"]],pick:"Treat as unconfirmed",why:"Confidential filings are not public; single-source report.",sev:"open"}]},
+
+{ id:"acev", name:"AceVector", sector:"E-commerce (Snapdeal, Unicommerce)", hq:"Not stated in sources",
+  event:{date:"2026-09-25", label:"IPO documents filed; anchor allocation"},
+  f:{trigger:40, fit:45, budget:85, reach:25},
+  fw:{trigger:"IPO paperwork is a milestone, not a buying signal.",fit:"Owns Unicommerce, an e-commerce software vendor. Weak fit.",budget:"Large.",reach:"Large listed-to-be company."},
+  action:{t:"Watch", text:"IPO quiet period. Skip for now."},
+  brief:{what:"Parent of Snapdeal and Unicommerce, backed by SoftBank.",now:["RHP filed: Rs 287 Cr fresh issue plus an offer for sale.","Rs 189 Cr raised from anchor investors ahead of the IPO.","Turned free-cash-flow positive in FY26 (company)."],opps:["Limited."],risks:["Quiet period; owns software businesses."],ask:["—"]},
+  who:{reasoning:"Not pursued.",people:[{r:"Later", n:"CFO",w:"—"}],avoid:"—"},outreach:null,
+  changes:[{f:"IPO",b:"Not filed",a:"RHP filed; Rs 287 Cr fresh issue; Rs 189 Cr from anchors",k:"ipo_filing"},{f:"Free cash flow",b:"Not stated",a:"Positive in FY26 (company)",k:"metric_claim"}],
+  sources:[{o:"SEBI RHP, as reported by Entrackr",tier:"T1",u:[WEEKLY]}],conflicts:[]},
+
+{ id:"pine", name:"Pine Labs", sector:"Payments", hq:"Not stated in sources",
+  event:{date:"2026-09-22", label:"Mastercard exits stake; soundbox rollout"},
+  f:{trigger:35, fit:40, budget:95, reach:20},
+  fw:{trigger:"The headline event is an investor selling shares. That is not a buying signal.",fit:"Large payments company with an in-house engineering team.",budget:"Large.",reach:"Very low."},
+  action:{t:"Watch", text:"Mostly noise for a small vendor. The soundbox plan is capex, not tooling."},
+  brief:{what:"Payments company.",now:["Mastercard sold its entire 4.31% stake for Rs 933.5 Cr in a bulk deal.","Announced a plan to deploy 10 lakh Soundboxes."],opps:["Limited."],risks:["Enterprise procurement; in-house teams."],ask:["—"]},
+  who:{reasoning:"Not pursued.",people:[{r:"—", n:"—",w:"—"}],avoid:"—"},outreach:null,
+  changes:[{f:"Mastercard stake",b:"4.31%",a:"0% (sold for Rs 933.5 Cr)",k:"secondary_sale"},{f:"Soundboxes",b:"Not stated",a:"10 lakh to be deployed",k:"metric_claim"}],
+  sources:[{o:"Entrackr weekly report",tier:"T2",u:[WEEKLY]}],conflicts:[]}
+];
+
+/* ===================== CALC ===================== */
+const W0 = {trigger:.35, fit:.30, budget:.20, reach:.15};
+const HALF = 14;
+const age = d => Math.max(0, Math.round((TODAY - new Date(d+"T00:00:00"))/864e5));
+const fresh = a => .4 + .6*Math.pow(.5, a/HALF);
+function confidence(c){
+  let x = .35; const t = c.sources.map(s=>s.tier);
+  if(t.includes("T1")) x += .25;
+  if(c.sources.length>=2) x += .15;
+  if(c.sources.length>=3) x += .10;
+  x -= .07 * c.conflicts.filter(k=>k.sev==="open").length;
+  return Math.max(.2, Math.min(.95, +x.toFixed(2)));
+}
+function calc(c, w){
+  const a = age(c.event.date), fr = fresh(a), cf = confidence(c);
+  const tEff = c.f.trigger*fr;
+  const raw = w.trigger*tEff + w.fit*c.f.fit + w.budget*c.f.budget + w.reach*c.f.reach;
+  const fin = raw*(.75+.25*cf);
+  const strength = Math.max(0, ...c.changes.map(x=>RULES[x.k].s));
+  let verdict;
+  if(strength>=2 && c.f.fit<45) verdict="Low fit";
+  else if(strength>=2 && cf>=.6) verdict="Act";
+  else if(strength>=2) verdict="Verify first";
+  else if(strength===1) verdict="Watch";
+  else verdict="Skip";
+  return {a, fr, cf, tEff, raw, fin, strength, verdict};
+}
+/*UI*/
+/* ===================== UI ===================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const store = {
+  get(){try{return JSON.parse(localStorage.getItem("acttoday.done")||"[]")}catch(e){return []}},
+  set(v){try{localStorage.setItem("acttoday.done",JSON.stringify(v))}catch(e){}}
+};
+const S = {mode:"today", sel:"olyv", tab:"brief", w:{...W0}, done:new Set(store.get())};
+const CHIP = {"Act":["c-act","Act today"],"Verify first":["c-ver","Verify first"],"Low fit":["c-low","Low fit"],"Watch":["c-wat","Watch"],"Skip":["c-skp","Skip"]};
+const chip = v => `<span class="chip ${CHIP[v][0]}">${CHIP[v][1]}</span>`;
+
+function ranked(){
+  const w = normW();
+  return C.map(c=>({c, r:calc(c,w)})).sort((x,y)=>y.r.fin-x.r.fin);
+}
+function normW(){const s=S.w.trigger+S.w.fit+S.w.budget+S.w.reach||1;return {trigger:S.w.trigger/s,fit:S.w.fit/s,budget:S.w.budget/s,reach:S.w.reach/s};}
+function split(list){
+  const cand = list.filter(x=>(x.r.verdict==="Act"||x.r.verdict==="Verify first") && !S.done.has(x.c.id));
+  const top = cand.slice(0,5);
+  const ids = new Set(top.map(x=>x.c.id));
+  return {top, rest:list.filter(x=>!ids.has(x.c.id))};
+}
+function bar(r){
+  const hold = Math.max(0, r.raw - r.fin);
+  return `<div class="bar" role="img" aria-label="Score ${r.fin.toFixed(1)}, ${hold.toFixed(1)} held back by data doubt"><i class="solid" style="width:${r.fin}%"></i><i class="hatch" style="width:${hold}%"></i></div>`;
+}
+function renderList(){
+  const list = ranked(); const {top, rest} = split(list);
+  const shown = S.mode==="today" ? top : list;
+  $("sub").textContent = S.mode==="today"
+    ? `Five things worth doing today, out of ${C.length} companies watched. Each has one action.`
+    : `All ${C.length} companies ranked, before narrowing to five.`;
+  $("list").innerHTML = shown.map((x,i)=>{
+    const {c,r} = x;
+    return `<button class="row" data-id="${c.id}" aria-current="${S.sel===c.id}">
+      <div class="rk">${i+1}</div>
+      <div><div><span class="nm">${esc(c.name)}</span>${chip(r.verdict)}</div>
+        <div class="rsub">${esc(c.event.label)} · ${r.a} day${r.a===1?"":"s"} ago</div>
+        ${S.mode==="today"?`<p class="act-line">${esc(c.action.text)}</p>`:""}
+        ${bar(r)}
+      </div><div class="sc">${r.fin.toFixed(1)}</div></button>
+      ${S.mode==="today"?`<div class="mini" style="padding:0 4px 12px 42px"><button data-done="${c.id}">Mark done</button></div>`:""}`;
+  }).join("") || `<p style="padding:18px 4px;color:var(--muted)">All five are done. Reset done to start again, or open “All 12 ranked”.</p>`;
+  const below = S.mode==="today" ? rest : [];
+  $("below").style.display = below.length ? "" : "none";
+  $("below").querySelector("summary").textContent = `Below the line: ${below.length} not worth today`;
+  $("belowlist").innerHTML = below.map(x=>`<button class="brow" data-id="${x.c.id}"><span><b>${esc(x.c.name)}</b> ${chip(x.r.verdict)}</span><span class="mono">${x.r.fin.toFixed(1)}</span><small>${esc(S.done.has(x.c.id)?"Marked done today.":x.c.action.text)}</small></button>`).join("");
+}
+function tabsHTML(){
+  const t = [["brief","Brief"],["who","Who to approach"],["out","Outreach"],["chg","What changed"],["ev","Evidence"]];
+  return `<div class="tabs" role="tablist">${t.map(([k,l])=>`<button role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${l}</button>`).join("")}</div>`;
+}
+const li = (a,tag) => `<ul class="t">${a.map(x=>`<li>${esc(x)}${tag?` <span class="tag inf">inferred</span>`:""}</li>`).join("")}</ul>`;
+function tabBrief(c,r){
+  const F = [["Trigger, faded for age",c.f.trigger,c.fw.trigger,`${c.f.trigger} × ${r.fr.toFixed(2)} freshness (${r.a} days) = ${r.tEff.toFixed(0)}`],["Automation fit",c.f.fit,c.fw.fit,""],["Budget readiness",c.f.budget,c.fw.budget,""],["Reachability",c.f.reach,c.fw.reach,""]];
+  return `<h3>What they do</h3><p style="max-width:72ch;margin:0">${esc(c.brief.what)}</p>
+  <h3>Why now</h3>${li(c.brief.now)}
+  <h3>Where automation could fit</h3>${li(c.brief.opps,true)}
+  <h3>Watch-outs</h3>${li(c.brief.risks)}
+  <h3>Good questions to ask</h3>${li(c.brief.ask)}
+  <h3>Why this score</h3>${F.map(f=>`<div class="fac"><div>${f[0]}</div><div class="fv">${f[1]}</div><p>${esc(f[2])}${f[3]?`<br><span class="mono">${f[3]}</span>`:""}</p></div>`).join("")}
+  <p style="color:var(--muted);font-size:14px">Confidence ${(r.cf*100).toFixed(0)}% scales the score by ×${(.75+.25*r.cf).toFixed(2)}. Unverified data can cost at most 25% of the score.</p>`;
+}
+function tabWho(c){
+  return `<p style="max-width:72ch;margin-top:0">${esc(c.who.reasoning)}</p>
+  <div class="who">${c.who.people.map((p,i)=>`<div class="pcard ${i===0?"first":""}"><small style="color:var(--muted);font-weight:600">${esc(p.r)}</small><br><b>${esc(p.n)}</b><p>${esc(p.w)}</p></div>`).join("")}</div>
+  <h3>Who not to start with</h3><p style="margin:0;max-width:72ch">${esc(c.who.avoid)}</p>
+  <div class="note">Names come only from the sources. Where a role is not stated I say so instead of guessing.</div>`;
+}
+function tabOut(c){
+  if(!c.outreach) return `<div class="note">No draft yet. This company is <b>${esc(c.action.t==="Verify"?"waiting on verification":"not a target today")}</b>. A message written on unverified facts is the kind of generic spam this desk exists to avoid. The pipeline writes a draft as soon as the facts are confirmed.</div>`;
+  const words = c.outreach.body.split(/\s+/).length;
+  return `<input class="subj" id="subj" value="${esc(c.outreach.subject)}" aria-label="Subject">
+  <textarea id="body" aria-label="Message body">${esc(c.outreach.body)}</textarea>
+  <div class="row-actions"><button class="btn" id="copy">Copy</button><span>${words} words · edit freely · fill the [brackets] with your own details</span></div>
+  <h3>Why this doesn’t read as generic</h3>
+  <div class="tw"><table><thead><tr><th>Fact used</th><th>Where it came from</th></tr></thead><tbody>${c.outreach.facts.map(f=>`<tr><td>${esc(f[0])}</td><td>${esc(f[1])}</td></tr>`).join("")}</tbody></table></div>
+  <div class="note">One idea, one small ask, no flattery. Anything that is my opinion rather than a sourced fact is labelled above so it can be softened or cut.</div>`;
+}
+function tabChg(c,r){
+  const sig = c.changes.filter(x=>RULES[x.k].v==="signal");
+  let line;
+  if(r.verdict==="Act") line=`<b>Worth acting on.</b> ${sig.length} real signal${sig.length>1?"s":""} and the data holds up (confidence ${(r.cf*100).toFixed(0)}%).`;
+  else if(r.verdict==="Verify first") line=`<b>Promising, but verify first.</b> The signal is real; confidence is only ${(r.cf*100).toFixed(0)}%.`;
+  else if(r.verdict==="Low fit") line=`<b>Real event, wrong buyer.</b> Signal is strong but automation fit is ${c.f.fit}.`;
+  else if(r.verdict==="Watch") line=`<b>Watch.</b> Nothing here is a buying trigger yet.`;
+  else line=`<b>Ignore.</b> Only noise.`;
+  return `<p class="verdictline">${line}</p>
+  <div class="tw"><table><thead><tr><th>What</th><th>Before</th><th>Now</th><th>Verdict</th></tr></thead><tbody>
+  ${c.changes.map(x=>{const R=RULES[x.k];const cl=R.v==="signal"?"c-sig":R.v==="watch"?"c-wat":"c-noi";return `<tr><td>${esc(x.f)}</td><td>${esc(x.b)}</td><td>${esc(x.a)}</td><td><span class="chip ${cl}">${R.v==="signal"?"Signal":R.v==="watch"?"Context":"Noise"}</span><div style="color:var(--muted);font-size:13px;margin-top:4px">${esc(R.why)}</div></td></tr>`}).join("")}
+  </tbody></table></div>
+  <div class="note">“Before” values come from what each source itself says about the prior state (previous round, prior stake, earlier name). Where no prior was found it says so. In production the pipeline stores dated snapshots and computes this diff itself.</div>`;
+}
+function tabEv(c,r){
+  return `<h3>Confidence</h3><div class="meter" role="img" aria-label="Confidence ${(r.cf*100).toFixed(0)} percent"><i style="width:${r.cf*100}%"></i></div>
+  <p style="color:var(--muted);font-size:14px;margin:6px 0 0">${(r.cf*100).toFixed(0)}%. Based on independent origins (${c.sources.length}), whether one is a primary source, and ${c.conflicts.filter(k=>k.sev==="open").length} open conflict(s). Republished copies of one origin count once.</p>
+  <h3>Sources, by origin</h3><div class="tw"><table><thead><tr><th>Origin</th><th>Tier</th><th>Links</th></tr></thead><tbody>
+  ${c.sources.map(s=>`<tr><td>${esc(s.o)}</td><td>${s.tier}</td><td>${s.u.map(u=>`<a href="${esc(u[1])}" target="_blank" rel="noopener noreferrer">${esc(u[0])}</a>`).join("<br>")}</td></tr>`).join("")}</tbody></table></div>
+  <p style="color:var(--muted);font-size:13px">T1 = filings or the company itself · T2 = outlet with original reporting · T3 = aggregator or rewrite</p>
+  <h3>Where sources disagree, and what I used</h3>
+  ${c.conflicts.length?`<div class="tw"><table><thead><tr><th>Field</th><th>Claims</th><th>Used</th><th>Why</th></tr></thead><tbody>${c.conflicts.map(k=>`<tr><td>${esc(k.f)}${k.sev==="open"?` <span class="chip c-ver">open</span>`:""}</td><td>${k.claims.map(x=>`<div><b>${esc(x[0])}</b> <span style="color:var(--muted)">${esc(x[1])}</span></div>`).join("")}</td><td>${esc(k.pick)}</td><td>${esc(k.why)}</td></tr>`).join("")}</tbody></table></div>`:`<p style="color:var(--muted)">No conflicts found between the sources gathered.</p>`}
+  <div class="note"><b>Resolution rules, in order:</b> 1) a primary source (filing or company) beats a rewrite. 2) The exact figure beats a rounded one. 3) The earliest dated report beats syndicated copies. 4) If sources are the same origin, agreement proves nothing. 5) If still unclear, say “unconfirmed” in the message and the dashboard, and do not quote a number.</div>`;
+}
+function renderDetail(){
+  const x = ranked().find(y=>y.c.id===S.sel); if(!x){$("detail").innerHTML="";return;}
+  const {c,r} = x;
+  const body = {brief:tabBrief,who:tabWho,out:tabOut,chg:tabChg,ev:tabEv}[S.tab](c,r);
+  $("detail").innerHTML = `<div class="dh"><div><h2>${esc(c.name)}</h2><div class="meta">${esc(c.sector)} · ${esc(c.hq)} · ${chip(r.verdict)}</div></div>
+    <div class="big">${r.fin.toFixed(1)}<small>of ${r.raw.toFixed(1)} if fully verified</small></div></div>
+    <p class="act-line" style="margin:10px 0 0"><b>Next step:</b> ${esc(c.action.text)}</p>${tabsHTML()}${body}`;
+  const cp = $("copy"); if(cp) cp.onclick = ()=>{
+    const t = $("body"); const txt = "Subject: "+$("subj").value+"\n\n"+t.value;
+    const ok = () => { cp.textContent="Copied"; setTimeout(()=>cp.textContent="Copy",1400); };
+    try{ navigator.clipboard.writeText(txt).then(ok,()=>{t.select();document.execCommand("copy");ok();}); }catch(e){ t.select(); try{document.execCommand("copy");ok();}catch(_){} }
+  };
+}
+function renderSliders(){
+  const L = {trigger:"Trigger",fit:"Automation fit",budget:"Budget",reach:"Reach"};
+  $("sliders").innerHTML = `<p><b>Weights</b> (they renormalise to 100%)</p>` + Object.keys(L).map(k=>`<label class="sl"><span>${L[k]}</span><input type="range" min="0" max="100" value="${Math.round(S.w[k]*100)}" data-w="${k}" aria-label="${L[k]} weight"><span class="mono" id="wv-${k}">${Math.round(normW()[k]*100)}%</span></label>`).join("") + `<p style="margin-top:10px">Try setting Fit to 100 and the rest to 0: the ranking becomes “who needs automation most”, ignoring timing.</p>`;
+}
+function renderAll(){renderList();renderDetail();}
+document.addEventListener("click", e=>{
+  const t = e.target.closest("button"); if(!t) return;
+  if(t.dataset.done){S.done.add(t.dataset.done);store.set([...S.done]);renderAll();e.stopPropagation();return;}
+  if(t.dataset.id){S.sel=t.dataset.id;S.tab="brief";renderAll();if(innerWidth<900)$("detail").scrollIntoView({behavior:"smooth",block:"start"});return;}
+  if(t.dataset.tab){S.tab=t.dataset.tab;renderDetail();return;}
+  if(t.id==="m-today"||t.id==="m-all"){S.mode=t.id==="m-today"?"today":"all";$("m-today").setAttribute("aria-pressed",S.mode==="today");$("m-all").setAttribute("aria-pressed",S.mode==="all");renderList();return;}
+  if(t.id==="reset"){S.done.clear();store.set([]);renderAll();}
+});
+document.addEventListener("input", e=>{
+  const k = e.target.dataset && e.target.dataset.w; if(!k) return;
+  S.w[k] = e.target.value/100; const n = normW();
+  Object.keys(n).forEach(j=>{const el=$("wv-"+j); if(el) el.textContent=Math.round(n[j]*100)+"%";});
+  renderAll();
+});
+renderSliders(); renderAll();
+</script>
+</body>
+</html>
