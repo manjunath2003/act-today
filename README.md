@@ -1,6 +1,6 @@
 # Act Today: Product Engineer test submission
 
-**Candidate:** Manjunath K N (Maxx), Bengaluru
+**Candidate:** Manjunath K N , Bengaluru
 **Live dashboard:** `[PASTE LIVE LINK]` (also in this folder as `dashboard/index.html`, open it in any browser)
 **Time spent:** `[FILL IN]`
 
