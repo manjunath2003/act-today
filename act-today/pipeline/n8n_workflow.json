@@ -1,0 +1,310 @@
+{
+  "name": "Act Today: company -> research -> AI -> DB",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "act-today",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "n1",
+      "name": "Webhook: company in",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "n2",
+      "name": "Fetch company site",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({api_key: $env.TAVILY_API_KEY, query: $('Webhook: company in').item.json.body.name + ' funding OR hires OR launches OR expansion', max_results: 6, days: 30}) }}",
+        "options": {}
+      },
+      "id": "n3",
+      "name": "News search (Tavily)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const name = $('Webhook: company in').first().json.body.name;\nconst site = String($('Fetch company site').first().json.data || '').replace(/<script[\\s\\S]*?<\\/script>|<style[\\s\\S]*?<\\/style>|<[^>]+>/g,' ').replace(/\\s+/g,' ').slice(0,6000);\nconst news = ($('News search (Tavily)').first().json.results || []);\nconst seen = new Set(); const sources = [];\nfor (const r of news) { const host = new URL(r.url).hostname.replace(/^www\\./,''); if (!seen.has(host)) { seen.add(host); sources.push({origin: host, tier: 'T3', url: r.url}); } }\nconst evidence = '[SOURCE company site]\\n' + site + '\\n\\n' + news.map(r => '[SOURCE ' + r.url + ']\\n' + (r.content||'').slice(0,1500)).join('\\n\\n');\nreturn [{json: {name, evidence, sources}}];"
+      },
+      "id": "n4",
+      "name": "Merge + build evidence",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.ANTHROPIC_API_KEY }}"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({model: $env.ANTHROPIC_MODEL || 'claude-sonnet-5-5', max_tokens: 2000, system: \"You are a sales-intelligence analyst. Use ONLY the evidence provided.\\nReturn one JSON object and nothing else, with exactly these keys:\\ncompany, summary, signals[{kind,fact,date,evidence_url}], automation_opportunities[{idea,basis}],\\npersonas[{role,name,why}], risks[], factors{trigger,fit,budget,reach}, conflicts[{field,claims[{value,source}],sev}]\\nRules: kind must be one of: %s.\\nbasis is \\\"stated\\\" or \\\"inferred\\\". factors are integers 0-100. Use null for anything unknown; never guess names,\\nnumbers or dates. If two sources disagree, add a conflict (sev \\\"open\\\" if you cannot resolve it, else \\\"minor\\\").\", messages: [{role: 'user', content: 'Company: ' + $json.name + '\\n\\nEVIDENCE\\n' + $json.evidence.slice(0, 24000)}]}) }}",
+        "options": {}
+      },
+      "id": "n5",
+      "name": "Claude: analyse to JSON",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $('Merge + build evidence').first().json;\nconst txt = ($json.content || []).filter(b => b.type === 'text').map(b => b.text).join('');\nconst m = txt.match(/\\{[\\s\\S]*\\}/); if (!m) throw new Error('no JSON in model output');\nconst a = JSON.parse(m[0]);\nfor (const k of ['company','summary','signals','factors','conflicts','personas']) if (!(k in a)) throw new Error('missing ' + k);\nconst S = {funding_round:3, leadership_c_suite:3, expansion_plan:2, launch:2, use_of_funds_tech:2, valuation_up:1, ipo_filing:1, leadership_board:1, metric_claim:1, rebrand:0, secondary_sale:0};\nconst f = a.factors, tiers = prev.sources.map(s => s.tier);\nlet conf = .35 + (tiers.includes('T1') ? .25 : 0) + (prev.sources.length >= 2 ? .15 : 0) + (prev.sources.length >= 3 ? .10 : 0) - .07 * a.conflicts.filter(c => c.sev === 'open').length;\nconf = Math.max(.2, Math.min(.95, +conf.toFixed(2)));\nconst raw = .35 * f.trigger * (0.4 + 0.6 * Math.pow(.5, 7/14)) + .30 * f.fit + .20 * f.budget + .15 * f.reach;\nconst final = +(raw * (.75 + .25 * conf)).toFixed(1);\nconst strength = Math.max(0, ...a.signals.map(s => S[s.kind] ?? 0));\nconst verdict = strength >= 2 && f.fit < 45 ? 'Low fit' : strength >= 2 && conf >= .6 ? 'Act' : strength >= 2 ? 'Verify first' : strength === 1 ? 'Watch' : 'Skip';\nreturn [{json: {name: prev.name, analysis: JSON.stringify(a), sources: JSON.stringify(prev.sources), raw: +raw.toFixed(1), final, conf, verdict}}];"
+      },
+      "id": "n6",
+      "name": "Parse, validate, score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH c AS (INSERT INTO companies(name,url) VALUES ($1,$2) ON CONFLICT (url) DO UPDATE SET name=EXCLUDED.name RETURNING id), s AS (INSERT INTO snapshots(company_id,content_hash,analysis,sources) SELECT id, md5($3), $3::jsonb, $4::jsonb FROM c RETURNING id) INSERT INTO scores(snapshot_id,raw,final,confidence,verdict) SELECT id,$5,$6,$7,$8 FROM s RETURNING snapshot_id;",
+        "options": {
+          "queryReplacement": "={{ [$json.name, $('Webhook: company in').first().json.body.url, $json.analysis, $json.sources, $json.raw, $json.final, $json.conf, $json.verdict] }}"
+        }
+      },
+      "id": "n7",
+      "name": "Postgres: save snapshot + score",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1300,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "REPLACE_ME",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $('Parse, validate, score').first().json.verdict }}",
+              "rightValue": "Act",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c2",
+              "leftValue": "={{ $('Parse, validate, score').first().json.verdict }}",
+              "rightValue": "Verify first",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "n8",
+      "name": "Worth acting on today?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "n9",
+      "name": "Notify (add Slack or Email node here)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "n10",
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook: company in": {
+      "main": [
+        [
+          {
+            "node": "Fetch company site",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "News search (Tavily)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch company site": {
+      "main": [
+        [
+          {
+            "node": "Merge + build evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News search (Tavily)": {
+      "main": [
+        [
+          {
+            "node": "Merge + build evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge + build evidence": {
+      "main": [
+        [
+          {
+            "node": "Claude: analyse to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude: analyse to JSON": {
+      "main": [
+        [
+          {
+            "node": "Parse, validate, score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse, validate, score": {
+      "main": [
+        [
+          {
+            "node": "Postgres: save snapshot + score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres: save snapshot + score": {
+      "main": [
+        [
+          {
+            "node": "Worth acting on today?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Worth acting on today?": {
+      "main": [
+        [
+          {
+            "node": "Notify (add Slack or Email node here)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "meta": {
+    "note": "Starter workflow. Not run inside n8n in the environment where it was written; import, attach Postgres credentials, set env vars, test with the curl in README."
+  }
+}
