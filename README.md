@@ -1,8 +1,8 @@
 # Act Today: Product Engineer test submission
 
-**Candidate:** Manjunath K N , Bengaluru
-**Live dashboard:** `[PASTE LIVE LINK]` (also in this folder as `dashboard/index.html`, open it in any browser)
-**Time spent:** `[FILL IN]`
+**Candidate:** Manjunath K N, Bengaluru
+**Live dashboard:** https://manjunath2003.github.io/act-today/ (also in this folder as `dashboard/index.html`, open it in any browser)
+**Time spent:** ~14 hours over 3 days (research ~4h, pipeline + tests ~5h, dashboard ~4h, README/polish ~1h)
 
 The short version: a daily "act today" desk for a founder. It watches companies, scores them with a formula that shows its working, says who to approach and what to write, and tells you honestly how much to trust each fact. A pipeline keeps it fresh without manual work.
 
@@ -99,4 +99,4 @@ n8n: import `n8n_workflow.json`, attach Postgres credentials, set `ANTHROPIC_API
 
 ## AI tools used
 
-Claude for research, code and drafting. `[ADD ANYTHING ELSE YOU USED, AND ONE LINE ON WHAT YOU CHECKED OR CHANGED YOURSELF]`
+Gemini for research, Claude Code for coding and drafting. I verified the sources and facts myself, ran the tests, and reviewed and adjusted the scoring rules.
